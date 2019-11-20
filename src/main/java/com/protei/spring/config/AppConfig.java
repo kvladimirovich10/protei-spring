@@ -1,16 +1,24 @@
 package com.protei.spring.config;
 
 
+import com.protei.spring.service.UserService;
+import com.protei.spring.service.UserServiceImpl;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.hibernate.SessionFactory;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Objects;
 import java.util.Properties;
@@ -20,21 +28,17 @@ import java.util.Properties;
 @Configuration
 @PropertySource("classpath:app.properties")
 @EnableTransactionManagement
-@ComponentScans(value = { @ComponentScan("com.protei.spring.dao"), @ComponentScan("com.protei.spring.service") })
+@EnableWebMvc
+@EnableJpaRepositories("com.protei.spring.repository")
+@ComponentScan(basePackages = "com.protei.spring")
 public class AppConfig {
 
     @Autowired
     private Environment environment;
 
     @Bean
-    public LocalSessionFactoryBean sessionFactory() {
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-
-        sessionFactory.setDataSource(getDataSource());
-        sessionFactory.setPackagesToScan("com.protei.spring.model");
-        sessionFactory.setHibernateProperties(getHibernateProperties());
-
-        return sessionFactory;
+    public UserService userService() {
+        return new UserServiceImpl();
     }
 
     @Bean
@@ -48,15 +52,19 @@ public class AppConfig {
         return dataSource;
     }
 
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
+        bean.setDataSource(getDataSource());
+        bean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+        bean.setPackagesToScan("com.protei.spring.model");
+        bean.setJpaProperties(getHibernateProperties());
+        return bean;
+    }
 
     @Bean
-    @Autowired
-    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
-
-        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-        transactionManager.setSessionFactory(sessionFactory);
-
-        return transactionManager;
+    public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory);
     }
 
     @Bean
@@ -69,7 +77,8 @@ public class AppConfig {
         Properties properties = new Properties();
         properties.put("hibernate.hbm2ddl.auto", Objects.requireNonNull(environment.getProperty("hibernate.hbm2ddl.auto")));
         properties.put("hibernate.dialect", Objects.requireNonNull(environment.getProperty("hibernate.dialect")));
-        properties.put("hibernate.globally__quoted__identifiers", "true");
+        properties.put("hibernate.globally__quoted__identifiers",
+                Objects.requireNonNull(environment.getProperty("hibernate.globally__quoted__identifiers")));
 
         return properties;
     }
