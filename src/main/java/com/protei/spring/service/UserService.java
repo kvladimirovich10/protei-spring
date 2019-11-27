@@ -4,4 +4,6 @@ import com.protei.spring.model.User;
 
 public interface UserService {
     Long addUser(User user);
+
+    User getUserById(Long id);
 }

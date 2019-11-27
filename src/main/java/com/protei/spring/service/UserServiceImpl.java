@@ -1,5 +1,6 @@
 package com.protei.spring.service;
 
+import com.protei.spring.exception.UserNotFoundException;
 import com.protei.spring.model.User;
 import com.protei.spring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,5 +19,14 @@ public class UserServiceImpl implements UserService {
     public Long addUser(User user) {
         userRepository.saveAndFlush(user);
         return user.getId();
+    }
+
+    @Override
+    public User getUserById(Long userId) throws RuntimeException {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException(userId);
+        }
+        return user;
     }
 }

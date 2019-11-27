@@ -2,6 +2,8 @@ package com.protei.spring.model;
 
 
 import lombok.Data;
+//import org.hibernate.validator.constraints.Email;
+
 import javax.persistence.*;
 
 @Entity

@@ -42,6 +42,27 @@ public class AppConfig {
     }
 
     @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
+        bean.setDataSource(getDataSource());
+        bean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+        bean.setPackagesToScan("com.protei.spring.model");
+        bean.setJpaProperties(getHibernateProperties());
+        return bean;
+    }
+
+    @Bean
+    public LocalSessionFactoryBean sessionFactory() {
+        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+
+        sessionFactory.setDataSource(getDataSource());
+        sessionFactory.setPackagesToScan("com.protei.spring.model");
+        sessionFactory.setHibernateProperties(getHibernateProperties());
+
+        return sessionFactory;
+    }
+
+    @Bean
     public DataSource getDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName(environment.getProperty("jdbc.driverClassName"));
@@ -50,16 +71,6 @@ public class AppConfig {
         dataSource.setPassword(environment.getProperty("jdbc.pass"));
 
         return dataSource;
-    }
-
-    @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
-        bean.setDataSource(getDataSource());
-        bean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
-        bean.setPackagesToScan("com.protei.spring.model");
-        bean.setJpaProperties(getHibernateProperties());
-        return bean;
     }
 
     @Bean
@@ -77,8 +88,7 @@ public class AppConfig {
         Properties properties = new Properties();
         properties.put("hibernate.hbm2ddl.auto", Objects.requireNonNull(environment.getProperty("hibernate.hbm2ddl.auto")));
         properties.put("hibernate.dialect", Objects.requireNonNull(environment.getProperty("hibernate.dialect")));
-        properties.put("hibernate.globally__quoted__identifiers",
-                Objects.requireNonNull(environment.getProperty("hibernate.globally__quoted__identifiers")));
+        properties.put("hibernate.globally__quoted__identifiers", "true");
 
         return properties;
     }

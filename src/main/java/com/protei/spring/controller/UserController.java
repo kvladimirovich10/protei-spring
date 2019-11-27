@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -24,13 +25,18 @@ public class UserController {
     private Logger logger = Logger.getLogger(UserController.class.getName());
 
     @PostMapping(path = "/addUser")
-    public ResponseEntity<?> addUser(@RequestBody User user) {
+    public ResponseEntity<?> addUser(@RequestBody User user, BindingResult bindingResult) {
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            throw new RuntimeException(String.valueOf(bindingResult));
+        }
 
         Long newUserId = userService.addUser(user);
 
         logger.info(user.toString());
 
-        Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("id", newUserId);
 
         URI location = ServletUriComponentsBuilder
@@ -38,6 +44,13 @@ public class UserController {
                 .buildAndExpand(newUserId).toUri();
 
         return ResponseEntity.created(location).body(responseMap);
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable("id") Long userId) {
+        logger.info("id : " + userId);
+        User user = userService.getUserById(userId);
+        return ResponseEntity.ok(user);
     }
 }
 
