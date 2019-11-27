@@ -1,16 +1,17 @@
 package com.protei.spring.controller;
 
+import com.protei.spring.exception.FieldContentException;
+import com.protei.spring.exception.StatusNotFoundException;
 import com.protei.spring.model.User;
+import com.protei.spring.model.UserStatus;
 import com.protei.spring.service.UserService;
+import com.protei.spring.service.UserStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -22,35 +23,52 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserStatusService userStatusService;
+
     private Logger logger = Logger.getLogger(UserController.class.getName());
 
     @PostMapping(path = "/addUser")
-    public ResponseEntity<?> addUser(@RequestBody User user, BindingResult bindingResult) {
-
-        Map<String, Object> responseMap = new HashMap<>();
+    public ResponseEntity<?> addUser(@RequestBody User user,
+                                     BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new RuntimeException(String.valueOf(bindingResult));
         }
 
         Long newUserId = userService.addUser(user);
+        userStatusService.setStatus(new UserStatus(newUserId, UserStatus.Status.ONLINE));
 
-        logger.info(user.toString());
-
+        Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("id", newUserId);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(newUserId).toUri();
-
-        return ResponseEntity.created(location).body(responseMap);
+        return ResponseEntity.ok().body(responseMap);
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<?> getUserById(@PathVariable("id") Long userId) {
         logger.info("id : " + userId);
-        User user = userService.getUserById(userId);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.getUserInfoById(userId));
+    }
+
+    @PostMapping(path = "/{id}/setStatus")
+    public ResponseEntity<?> setStatus(@PathVariable("id") Long userId,
+                                       @RequestBody UserStatus userStatus,
+                                       BindingResult bindingResult) {
+
+
+        if (bindingResult.hasErrors()) {
+            logger.info("userStatus : " + userStatus.toString());
+            throw new FieldContentException(bindingResult);
+        }
+
+        userStatus.setId(userId);
+
+        logger.info("id : " + userId);
+        logger.info("userStatus : " + userStatus.toString());
+
+
+        return ResponseEntity.ok().body(userStatusService.setStatus(userStatus));
     }
 }
 

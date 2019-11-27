@@ -1,8 +1,11 @@
 package com.protei.spring.config;
 
 
+import com.protei.spring.model.UserStatus;
 import com.protei.spring.service.UserService;
 import com.protei.spring.service.UserServiceImpl;
+import com.protei.spring.service.UserStatusService;
+import com.protei.spring.service.UserStatusServiceImpl;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.hibernate.SessionFactory;
 import org.hibernate.jpa.HibernatePersistenceProvider;
@@ -23,6 +26,8 @@ import javax.sql.DataSource;
 import java.util.Objects;
 import java.util.Properties;
 
+import static com.protei.spring.service.UserServiceImpl.getUserServiceImpl;
+import static com.protei.spring.service.UserStatusServiceImpl.getUserStatusServiceImpl;
 
 
 @Configuration
@@ -38,7 +43,12 @@ public class AppConfig {
 
     @Bean
     public UserService userService() {
-        return new UserServiceImpl();
+        return getUserServiceImpl();
+    }
+
+    @Bean
+    public UserStatusService userStatusService() {
+        return getUserStatusServiceImpl();
     }
 
     @Bean
