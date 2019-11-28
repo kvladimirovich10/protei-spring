@@ -1,23 +1,19 @@
 package com.protei.spring.config;
 
 
-import com.protei.spring.model.UserStatus;
 import com.protei.spring.service.UserService;
-import com.protei.spring.service.UserServiceImpl;
 import com.protei.spring.service.UserStatusService;
-import com.protei.spring.service.UserStatusServiceImpl;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
-import org.hibernate.SessionFactory;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -52,6 +48,14 @@ public class AppConfig {
     }
 
     @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler(){
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(5);
+        threadPoolTaskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
+        return threadPoolTaskScheduler;
+    }
+
+    @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
         bean.setDataSource(getDataSource());
@@ -65,8 +69,8 @@ public class AppConfig {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
 
-        sessionFactory.setDataSource(getDataSource());
         sessionFactory.setPackagesToScan("com.protei.spring.model");
+        sessionFactory.setDataSource(getDataSource());
         sessionFactory.setHibernateProperties(getHibernateProperties());
 
         return sessionFactory;
@@ -86,11 +90,6 @@ public class AppConfig {
     @Bean
     public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
-    }
-
-    @Bean
-    public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
-        return new PersistenceExceptionTranslationPostProcessor();
     }
 
     private Properties getHibernateProperties() {

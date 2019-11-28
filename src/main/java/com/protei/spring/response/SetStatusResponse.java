@@ -13,4 +13,13 @@ public class SetStatusResponse {
         this.oldUserStatus = oldUserStatus;
         this.newUserStatus = newUserStatus;
     }
+
+    @Override
+    public String toString() {
+        return "SetStatusResponse{" +
+                "id=" + id +
+                ", oldUserStatus='" + oldUserStatus + '\'' +
+                ", newUserStatus='" + newUserStatus + '\'' +
+                '}';
+    }
 }

@@ -1,7 +1,6 @@
 package com.protei.spring.controller;
 
 import com.protei.spring.exception.FieldContentException;
-import com.protei.spring.exception.StatusNotFoundException;
 import com.protei.spring.model.User;
 import com.protei.spring.model.UserStatus;
 import com.protei.spring.service.UserService;
@@ -15,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import static com.protei.spring.model.UserStatus.Status.ONLINE;
 
 @RestController
 @RequestMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -37,7 +38,7 @@ public class UserController {
         }
 
         Long newUserId = userService.addUser(user);
-        userStatusService.setStatus(new UserStatus(newUserId, UserStatus.Status.ONLINE));
+        userStatusService.setStatus(new UserStatus(newUserId, ONLINE));
 
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("id", newUserId);
@@ -56,9 +57,7 @@ public class UserController {
                                        @RequestBody UserStatus userStatus,
                                        BindingResult bindingResult) {
 
-
         if (bindingResult.hasErrors()) {
-            logger.info("userStatus : " + userStatus.toString());
             throw new FieldContentException(bindingResult);
         }
 
@@ -66,7 +65,6 @@ public class UserController {
 
         logger.info("id : " + userId);
         logger.info("userStatus : " + userStatus.toString());
-
 
         return ResponseEntity.ok().body(userStatusService.setStatus(userStatus));
     }
