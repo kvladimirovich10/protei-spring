@@ -8,7 +8,6 @@ import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -22,8 +21,8 @@ import javax.sql.DataSource;
 import java.util.Objects;
 import java.util.Properties;
 
-import static com.protei.spring.service.UserServiceImpl.getUserServiceImpl;
-import static com.protei.spring.service.UserStatusServiceImpl.getUserStatusServiceImpl;
+import static com.protei.spring.serviceImpl.UserServiceImpl.getUserServiceImpl;
+import static com.protei.spring.serviceImpl.UserStatusServiceImpl.getUserStatusServiceImpl;
 
 
 @Configuration
@@ -51,7 +50,7 @@ public class AppConfig {
     public ThreadPoolTaskScheduler threadPoolTaskScheduler(){
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
         threadPoolTaskScheduler.setPoolSize(5);
-        threadPoolTaskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
+        threadPoolTaskScheduler.setThreadNamePrefix("Scheduler");
         return threadPoolTaskScheduler;
     }
 

@@ -1,18 +1,16 @@
-package com.protei.spring.service;
+package com.protei.spring.serviceImpl;
 
-import com.protei.spring.controller.UserController;
 import com.protei.spring.model.UserStatus;
 import com.protei.spring.repository.UserStatusRepository;
 import com.protei.spring.response.SetStatusResponse;
+import com.protei.spring.service.UserService;
+import com.protei.spring.service.UserStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.Period;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import static com.protei.spring.model.UserStatus.Status.AWAY;
 import static com.protei.spring.model.UserStatus.Status.NO_STATUS;
@@ -30,8 +28,6 @@ public class UserStatusServiceImpl implements UserStatusService {
     @Autowired
     UserService userService;
 
-
-    private Logger logger = Logger.getLogger(UserStatusServiceImpl.class.getName());
     private static final Long executionDelayInMinutes = 5L;
 
     private UserStatusServiceImpl() {
@@ -55,7 +51,6 @@ public class UserStatusServiceImpl implements UserStatusService {
             Date initDelayDate = new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(executionDelayInMinutes));
 
             threadPoolTaskScheduler.schedule(() -> {
-                logger.info("ITS TIME TO AWAY!");
                 newStatus.setUserStatus(AWAY);
                 userStatusRepository.saveAndFlush(newStatus);
             }, initDelayDate);

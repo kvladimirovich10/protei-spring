@@ -27,8 +27,6 @@ public class UserController {
     @Autowired
     private UserStatusService userStatusService;
 
-    private Logger logger = Logger.getLogger(UserController.class.getName());
-
     @PostMapping(path = "/addUser")
     public ResponseEntity<?> addUser(@RequestBody User user,
                                      BindingResult bindingResult) {
@@ -48,7 +46,6 @@ public class UserController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<?> getUserById(@PathVariable("id") Long userId) {
-        logger.info("id : " + userId);
         return ResponseEntity.ok(userService.getUserInfoById(userId));
     }
 
@@ -62,9 +59,6 @@ public class UserController {
         }
 
         userStatus.setId(userId);
-
-        logger.info("id : " + userId);
-        logger.info("userStatus : " + userStatus.toString());
 
         return ResponseEntity.ok().body(userStatusService.setStatus(userStatus));
     }

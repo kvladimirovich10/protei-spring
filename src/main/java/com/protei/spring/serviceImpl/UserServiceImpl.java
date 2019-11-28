@@ -1,10 +1,12 @@
-package com.protei.spring.service;
+package com.protei.spring.serviceImpl;
 
 import com.protei.spring.exception.UserNotFoundException;
 import com.protei.spring.model.User;
 import com.protei.spring.model.UserStatus;
 import com.protei.spring.repository.UserRepository;
 import com.protei.spring.response.FullUserResponse;
+import com.protei.spring.service.UserService;
+import com.protei.spring.service.UserStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
