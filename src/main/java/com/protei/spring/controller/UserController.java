@@ -11,15 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static com.protei.spring.model.UserStatus.Status.ONLINE;
+import static com.protei.spring.model.UserStatus.StatusEnum.ONLINE;
 
 @RestController
 @RequestMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
+
+    private static Logger log = Logger.getLogger(UserController.class.getName());
 
     @Autowired
     private UserService userService;
@@ -28,15 +31,15 @@ public class UserController {
     private UserStatusService userStatusService;
 
     @PostMapping(path = "/addUser")
-    public ResponseEntity<?> addUser(@RequestBody User user,
+    public ResponseEntity<?> addUser(@Valid @RequestBody User user,
                                      BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            throw new RuntimeException(String.valueOf(bindingResult));
+            throw new FieldContentException(bindingResult);
         }
 
         Long newUserId = userService.addUser(user);
-        userStatusService.setStatus(new UserStatus(newUserId, ONLINE));
+        userStatusService.setUserStatus(new UserStatus(newUserId, ONLINE));
 
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("id", newUserId);
@@ -50,17 +53,20 @@ public class UserController {
     }
 
     @PostMapping(path = "/{id}/setStatus")
-    public ResponseEntity<?> setStatus(@PathVariable("id") Long userId,
-                                       @RequestBody UserStatus userStatus,
-                                       BindingResult bindingResult) {
+    public ResponseEntity<?> setUserStatus(@PathVariable("id") Long userId,
+                                           @RequestBody UserStatus userStatus,
+                                           BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new FieldContentException(bindingResult);
         }
 
+        log.info("UserStatus body "+ userStatus);
+
+        userStatus.validateEnumStatus();
         userStatus.setId(userId);
 
-        return ResponseEntity.ok().body(userStatusService.setStatus(userStatus));
+        return ResponseEntity.ok().body(userStatusService.setUserStatus(userStatus));
     }
 }
 

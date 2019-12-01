@@ -5,6 +5,9 @@ import lombok.Data;
 //import org.hibernate.validator.constraints.Email;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Entity
 @Data
@@ -12,19 +15,26 @@ import javax.persistence.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="user_id", unique = true, nullable = false)
+    @Column(name = "user_id")
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 30)
+    @NotNull
+    @Column(length = 30, unique = true)
+    @Size(min = 1, max = 30)
     private String username;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @NotNull
+    @Pattern(regexp = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$", message = "invalid email form")
+    @Column(length = 50)
+    @Size(min = 5, max = 50)
     private String email;
 
-    @Column(unique = true, nullable = false, length = 20)
+    @Column(length = 50)
+    @Size(min = 1, max = 50)
     private String phoneNumber;
 
-    public User(){}
+    public User() {
+    }
 
     public User(String username, String email, String phoneNumber) {
         this.username = username;

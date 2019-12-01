@@ -2,6 +2,7 @@ package com.protei.spring.serviceImpl;
 
 import com.protei.spring.model.UserStatus;
 import com.protei.spring.repository.UserStatusRepository;
+import com.protei.spring.response.FullUserResponse;
 import com.protei.spring.response.SetStatusResponse;
 import com.protei.spring.service.UserService;
 import com.protei.spring.service.UserStatusService;
@@ -11,13 +12,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
-import static com.protei.spring.model.UserStatus.Status.AWAY;
-import static com.protei.spring.model.UserStatus.Status.NO_STATUS;
-import static com.protei.spring.model.UserStatus.Status.ONLINE;
+import static com.protei.spring.model.UserStatus.StatusEnum.AWAY;
+import static com.protei.spring.model.UserStatus.StatusEnum.NO_STATUS;
+import static com.protei.spring.model.UserStatus.StatusEnum.ONLINE;
 
 
 public class UserStatusServiceImpl implements UserStatusService {
+
+    private static Logger log = Logger.getLogger(UserStatusServiceImpl.class.getName());
 
     @Autowired
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
@@ -39,11 +43,11 @@ public class UserStatusServiceImpl implements UserStatusService {
 
     @Transactional
     @Override
-    public SetStatusResponse setStatus(UserStatus newStatus) {
+    public SetStatusResponse setUserStatus(UserStatus newStatus) {
 
-        String oldUserStatus = userStatusRepository.findUserStatusById(newStatus.getId()).
-                orElse(new UserStatus(newStatus.getId(), NO_STATUS)).
-                getUserStatus().name();
+        log.info("User status : "+newStatus.toString());
+
+        FullUserResponse currentUserInfo = userService.getUserInfoById(newStatus.getId());
 
         userStatusRepository.saveAndFlush(newStatus);
 
@@ -51,15 +55,12 @@ public class UserStatusServiceImpl implements UserStatusService {
             Date initDelayDate = new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(executionDelayInMinutes));
 
             threadPoolTaskScheduler.schedule(() -> {
-                newStatus.setUserStatus(AWAY);
+                newStatus.setNewUserStatus(AWAY);
                 userStatusRepository.saveAndFlush(newStatus);
             }, initDelayDate);
         }
 
-        return new SetStatusResponse(
-                newStatus.getId(),
-                oldUserStatus,
-                newStatus.getUserStatus().name());
+        return new SetStatusResponse(newStatus.getId(), currentUserInfo.getStatus(), newStatus.getUserStatus().name());
     }
 
     @Override

@@ -15,7 +15,7 @@ public class FullUserResponse {
     public FullUserResponse(User user, String status) {
         this.id = user.getId();
         this.username = user.getUsername();
-        this.email = user.getUsername();
+        this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.status = status;
     }

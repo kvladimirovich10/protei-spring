@@ -1,18 +1,23 @@
 package com.protei.spring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.protei.spring.controller.UserController;
+import com.protei.spring.exception.InvalidStatusException;
 import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.logging.Logger;
 
 @Entity
 @Data
 @Table(name = "user_status_table")
 public class UserStatus {
 
-    public enum Status {
+    private static Logger log = Logger.getLogger(UserStatus.class.getName());
+
+    public enum StatusEnum {
         ONLINE, AWAY, OFFLINE, NO_STATUS
     }
 
@@ -21,14 +26,14 @@ public class UserStatus {
     private Long id;
 
     @NotNull
-    private Status userStatus;
+    private String userStatus;
 
     @JsonIgnore
     private LocalDateTime lastTimeStatusChangeTime;
 
-    public UserStatus(Long id, Status userStatus) {
+    public UserStatus(Long id, StatusEnum status) {
         this.id = id;
-        this.userStatus = userStatus;
+        this.userStatus = status.name();
         this.lastTimeStatusChangeTime = LocalDateTime.now();
     }
 
@@ -43,27 +48,19 @@ public class UserStatus {
     public UserStatus() {
     }
 
-    public Long getId() {
-        return id;
+    public void validateEnumStatus() {
+        try {
+            StatusEnum.valueOf(this.userStatus);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidStatusException(this.userStatus);
+        }
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public StatusEnum getUserStatus() {
+        return StatusEnum.valueOf(this.userStatus);
     }
 
-    public Status getUserStatus() {
-        return userStatus;
-    }
-
-    public void setUserStatus(Status userStatus) {
-        this.userStatus = userStatus;
-    }
-
-    public LocalDateTime getLastTimeStatusChangeTime() {
-        return lastTimeStatusChangeTime;
-    }
-
-    public void setLastTimeStatusChangeTime() {
-        this.lastTimeStatusChangeTime = LocalDateTime.now();
+    public  void setNewUserStatus(StatusEnum status) {
+        this.userStatus = status.name();
     }
 }
