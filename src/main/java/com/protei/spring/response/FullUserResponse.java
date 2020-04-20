@@ -1,10 +1,7 @@
 package com.protei.spring.response;
 
 import com.protei.spring.model.User;
-import lombok.Data;
 
-
-@Data
 public class FullUserResponse {
     private Long id;
     private String username;
@@ -18,5 +15,25 @@ public class FullUserResponse {
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.status = status;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

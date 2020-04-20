@@ -1,6 +1,5 @@
 package com.protei.spring.config;
 
-
 import com.protei.spring.service.UserService;
 import com.protei.spring.service.UserStatusService;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;

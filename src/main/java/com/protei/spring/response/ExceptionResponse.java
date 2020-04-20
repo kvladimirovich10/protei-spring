@@ -1,11 +1,8 @@
 package com.protei.spring.response;
 
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 public class ExceptionResponse {
 
     private String exceptionClass;
@@ -22,5 +19,13 @@ public class ExceptionResponse {
 
     public void addExceptionMessage(String message) {
         messages.add(message);
+    }
+
+    public String getExceptionClass() {
+        return exceptionClass;
+    }
+
+    public List<String> getMessages() {
+        return messages;
     }
 }

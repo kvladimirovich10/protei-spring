@@ -1,9 +1,7 @@
 package com.protei.spring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.protei.spring.controller.UserController;
 import com.protei.spring.exception.InvalidStatusException;
-import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 @Entity
-@Data
 @Table(name = "user_status_table")
 public class UserStatus {
 
@@ -24,6 +21,10 @@ public class UserStatus {
     @Id
     @Column(name="user_id", unique = true, nullable = false)
     private Long id;
+
+    public void setUserStatus(String userStatus) {
+        this.userStatus = userStatus;
+    }
 
     @NotNull
     private String userStatus;
@@ -62,5 +63,13 @@ public class UserStatus {
 
     public  void setNewUserStatus(StatusEnum status) {
         this.userStatus = status.name();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

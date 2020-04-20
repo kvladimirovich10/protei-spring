@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import static com.protei.spring.model.UserStatus.StatusEnum.ONLINE;
 
 @RestController
-@RequestMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
     private static Logger log = Logger.getLogger(UserController.class.getName());
@@ -65,6 +65,7 @@ public class UserController {
 
         userStatus.validateEnumStatus();
         userStatus.setId(userId);
+        
 
         return ResponseEntity.ok().body(userStatusService.setUserStatus(userStatus));
     }

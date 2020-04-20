@@ -1,8 +1,5 @@
 package com.protei.spring.response;
 
-import lombok.Data;
-
-@Data
 public class SetStatusResponse {
     private Long id;
     private String oldUserStatus;
@@ -21,5 +18,17 @@ public class SetStatusResponse {
                 ", oldUserStatus='" + oldUserStatus + '\'' +
                 ", newUserStatus='" + newUserStatus + '\'' +
                 '}';
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getOldUserStatus() {
+        return oldUserStatus;
+    }
+
+    public String getNewUserStatus() {
+        return newUserStatus;
     }
 }
